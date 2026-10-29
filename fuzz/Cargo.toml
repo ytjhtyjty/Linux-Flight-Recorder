@@ -1,0 +1,17 @@
+[package]
+name = "lfr-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+[package.metadata]
+cargo-fuzz = true
+[dependencies]
+libfuzzer-sys = "0.4"
+linux-flight-recorder = { path = ".." }
+[[bin]]
+name = "parsers"
+path = "fuzz_targets/parsers.rs"
+test = false
+doc = false
+bench = false
+[workspace]

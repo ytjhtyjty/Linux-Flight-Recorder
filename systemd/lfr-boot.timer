@@ -1,0 +1,8 @@
+[Unit]
+Description=Deferred Linux Flight Recorder boot snapshot (experimental)
+[Timer]
+OnBootSec=2min
+AccuracySec=30s
+Unit=lfr-boot.service
+[Install]
+WantedBy=timers.target

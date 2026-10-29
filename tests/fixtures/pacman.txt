@@ -1,0 +1,2 @@
+linux 6.1.1-1
+linux-firmware 20261001-1

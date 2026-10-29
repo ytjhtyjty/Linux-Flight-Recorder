@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "before_id": "00000000000000000000000000000001",
+  "after_id": "00000000000000000000000000000002",
+  "limitations": [
+    "Boot IDs differ: hotplug, enumeration and runtime state can differ independently of updates.",
+    "Two observations cannot establish causality, source history or elapsed error rates."
+  ],
+  "changes": [
+    {
+      "collector": "journal",
+      "identity": "source",
+      "kind": "not_comparable",
+      "before": null,
+      "after": null,
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/journal",
+        "snapshot:00000000000000000000000000000002/collectors/journal"
+      ],
+      "note": "Journal windows/access differ or are not verified. Retained entries are observations only, never 'new errors'."
+    },
+    {
+      "collector": "packages",
+      "identity": "adapter=rpm;name=firmware;architecture=x",
+      "kind": "changed",
+      "before": {
+        "adapter": "rpm",
+        "architecture": "x",
+        "name": "firmware",
+        "stack_group": "firmware",
+        "version": "1"
+      },
+      "after": {
+        "adapter": "rpm",
+        "architecture": "x",
+        "name": "firmware",
+        "stack_group": "firmware",
+        "version": "2"
+      },
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/packages/records/0",
+        "snapshot:00000000000000000000000000000002/collectors/packages/records/0"
+      ],
+      "note": "Version differences are neutral version_changed; ordering not inferred."
+    },
+    {
+      "collector": "packages",
+      "identity": "adapter=rpm;name=kernel;architecture=x",
+      "kind": "changed",
+      "before": {
+        "adapter": "rpm",
+        "architecture": "x",
+        "name": "kernel",
+        "stack_group": "kernel",
+        "version": "6.1"
+      },
+      "after": {
+        "adapter": "rpm",
+        "architecture": "x",
+        "name": "kernel",
+        "stack_group": "kernel",
+        "version": "6.2"
+      },
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/packages/records/1",
+        "snapshot:00000000000000000000000000000002/collectors/packages/records/1"
+      ],
+      "note": "Version differences are neutral version_changed; ordering not inferred."
+    },
+    {
+      "collector": "pci",
+      "identity": "vendor=0x8086;device=0x1234;subsystem_vendor=;subsystem_device=;class=0x028000",
+      "kind": "changed",
+      "before": {
+        "class": "0x028000",
+        "device": "0x1234",
+        "driver": "iwlwifi",
+        "location": "0000:00:01.0",
+        "vendor": "0x8086"
+      },
+      "after": {
+        "class": "0x028000",
+        "device": "0x1234",
+        "location": "0000:00:01.0",
+        "vendor": "0x8086"
+      },
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/pci/records/0",
+        "snapshot:00000000000000000000000000000002/collectors/pci/records/0"
+      ],
+      "note": "Positive observations; location renumbering alone is ignored where hardware identity is available."
+    },
+    {
+      "collector": "services",
+      "identity": "name=wifi.service",
+      "kind": "added",
+      "before": null,
+      "after": {
+        "active": "failed",
+        "name": "wifi.service"
+      },
+      "evidence": [
+        "snapshot:00000000000000000000000000000002/collectors/services/records/0"
+      ],
+      "note": "Present only in complete later inventory."
+    },
+    {
+      "collector": "system",
+      "identity": "ID=debian",
+      "kind": "changed",
+      "before": {
+        "ID": "debian",
+        "kernel_release": "6.1"
+      },
+      "after": {
+        "ID": "debian",
+        "kernel_release": "6.2"
+      },
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/system/records/0",
+        "snapshot:00000000000000000000000000000002/collectors/system/records/0"
+      ],
+      "note": "Positive observations; location renumbering alone is ignored where hardware identity is available."
+    }
+  ],
+  "findings": [
+    {
+      "rule_id": "LFR-DRIVER-001",
+      "category": "pci",
+      "severity": "warning",
+      "confidence_basis": "The same unambiguous device signature is observed twice; a previously bound driver is absent. No causal test performed.",
+      "observation": "A device lost its observed driver binding.",
+      "hypothesis": "Possible driver initialization problem across a running-kernel change.",
+      "evidence": [
+        "snapshot:00000000000000000000000000000001/collectors/pci/records/0",
+        "snapshot:00000000000000000000000000000002/collectors/pci/records/0",
+        "snapshot:00000000000000000000000000000001/collectors/system/records/0",
+        "snapshot:00000000000000000000000000000002/collectors/system/records/0"
+      ],
+      "alternatives": [
+        "Hotplug, manual unbind, driver handoff or a collection race"
+      ],
+      "limitations": [
+        "Temporal correlation is not causality; no user-confirmed cause recorded."
+      ],
+      "safe_checks": [
+        "Inspect journalctl -b -k --priority=0..4 locally; review for private data before sharing.",
+        "Inspect the device's read-only driver symlink and installed firmware package versions."
+      ]
+    },
+    {
+      "rule_id": "LFR-SERVICE-001",
+      "category": "services",
+      "severity": "warning",
+      "confidence_basis": "A failed-unit inventory observation changed; failure onset is not established.",
+      "observation": "Failed system unit observed in later inventory.",
+      "hypothesis": "Service failure may be relevant to the reported symptom.",
+      "evidence": [
+        "snapshot:00000000000000000000000000000002/collectors/services/records/0"
+      ],
+      "alternatives": [
+        "Unrelated service, configuration or external resource failure"
+      ],
+      "limitations": [
+        "No ExecStart or environment collected; no automatic repair."
+      ],
+      "safe_checks": [
+        "Use systemctl status for the named unit locally; inspect its bounded journal window."
+      ]
+    }
+  ]
+}

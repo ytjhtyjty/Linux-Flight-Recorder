@@ -1,0 +1,17 @@
+{
+  "command_timeout_ms": 5000,
+  "command_output_bytes": 4194304,
+  "source_bytes": 16384,
+  "source_entries": 4096,
+  "source_timeout_ms": 3000,
+  "journal_records": 200,
+  "journal_window_seconds": 900,
+  "max_snapshots": 40,
+  "max_age_days": 30,
+  "max_store_bytes": 268435456,
+  "selected_services": [
+    "NetworkManager.service",
+    "systemd-networkd.service",
+    "bluetooth.service"
+  ]
+}

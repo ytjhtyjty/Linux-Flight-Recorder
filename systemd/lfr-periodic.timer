@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodic Linux Flight Recorder snapshot (experimental)
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=15min
+Persistent=yes
+Unit=lfr-periodic.service
+[Install]
+WantedBy=timers.target

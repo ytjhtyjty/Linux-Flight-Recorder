@@ -1,0 +1,1 @@
+#! [no_main] use libfuzzer_sys :: fuzz_target ; fuzz_target ! (| data : & [u8] | { if data . len () > 1024 * 1024 { return ; } let _ = linux_flight_recorder :: collect :: parse_journal (data , 1000) ; for adapter in ["dpkg" , "rpm" , "pacman"] { let _ = linux_flight_recorder :: collect :: parse_packages (adapter , data) ; } }) ;

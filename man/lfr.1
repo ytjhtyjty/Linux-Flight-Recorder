@@ -1,0 +1,52 @@
+.TH LFR 1 "2026-10-30" "Linux Flight Recorder 0.1.0" "User Commands"
+.SH NAME
+lfr \- local evidence-based Linux diagnostic snapshot comparison
+.SH SYNOPSIS
+.B lfr
+[\-\-store PATH] [\-\-system] [\-\-config JSON] COMMAND
+.SH DESCRIPTION
+Records bounded read-only system observations, stores them privately in SQLite,
+compares saved snapshots offline and emits reviewed evidence reports.
+No automatic repairs, telemetry, sudo invocation or hardware configuration writes.
+.SH COMMANDS
+.TP
+.B snapshot create [\-\-label TEXT] [\-\-source manual|timer|boot|package-event]
+Create snapshot. Exit 3 means it was saved with explicit source limitations.
+.TP
+.B snapshot list|show ID|delete ID|pin ID
+List, inspect, delete or protect snapshots. Deleting a pinned snapshot requires
+\-\-allow-pinned. IDs are 32 lowercase hexadecimal characters, not labels.
+.TP
+.B compare BEFORE AFTER [\-\-format text|json]
+Offline deterministic comparison; JSON contains full evidence pointers.
+.TP
+.B report BEFORE AFTER [\-\-symptom wifi|audio|TEXT] \-\-output PATH
+Write Markdown report without overwriting an existing path.
+.TP
+.B export ID \-\-preview
+List fixed public bundle members and redaction limitations.
+.TP
+.B export ID \-\-output bundle.tar.gz
+Write redacted diagnostic bundle. Manual privacy review is mandatory.
+.TP
+.B doctor
+Show trusted tool availability and context without collecting a snapshot.
+.TP
+.B config validate
+Validate explicit or default configuration and print effective JSON.
+.TP
+.B gc [\-\-dry-run]
+Plan or apply age/count/logical-size retention, preserving pins.
+.SH FILES
+$XDG_STATE_HOME/lfr or $HOME/.local/state/lfr for users; /var/lib/lfr for explicit
+root \-\-system mode. Private owner-only paths; no symlink store components.
+.SH EXIT STATUS
+0 success; 1 runtime/storage error; 2 usage/config error; 3 partial snapshot saved;
+130 interrupted by SIGINT/SIGTERM. JSON on stdout, diagnostics on stderr.
+.SH LIMITATIONS
+Development release. Containers do not validate boot/systemd/hardware support.
+Unknown sources are not negative evidence. No causal certainty or full anonymity.
+Logical quota excludes SQLite overhead and exported files. Sysfs timeouts are
+cooperative and cannot interrupt an uninterruptible kernel read.
+.SH SEE ALSO
+journalctl(1), systemctl(1), CONFIGURATION.md, PRIVACY.md, docs/VERIFICATION.md
